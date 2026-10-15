@@ -76,5 +76,17 @@ Double click run.bat in the root folder to open the interactive mode selector.
 - static/js/matrix.js: Matrix digital rain and 3D grid animation.
 - static/js/app.js: Real-time telemetry, holographic gauges, and actions.
 
+
+---
+
+## 5. API Endpoints (接口概览)
+
+- `GET /api/health` - System health heartbeat status and timestamp
+- `GET /api/stats` - Comprehensive hardware telemetry metrics
+- `GET /api/summary` - Aggregated resource consumption summary
+- `POST /api/purge_memory` - Trigger neural memory flush
+- `POST /api/kill/{pid}` - Terminate high-resource target process
+- `WS /ws/telemetry` - Real-time streaming WebSocket feed
+
 ---
 Encoding: UTF-8 (without BOM)

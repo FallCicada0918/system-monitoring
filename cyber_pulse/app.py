@@ -82,6 +82,20 @@ async def get_stats():
     return collector.get_stats()
 
 
+@app.get("/api/summary")
+async def get_summary_metrics():
+    stats = collector.get_stats()
+    return {
+        "status": "active",
+        "cpu_percent": stats.get("cpu", {}).get("total", 0.0),
+        "ram_percent": stats.get("ram", {}).get("percent", 0.0),
+        "disk_percent": stats.get("disk", {}).get("percent", 0.0),
+        "network_sent_mb": stats.get("network", {}).get("sent_mb", 0.0),
+        "network_recv_mb": stats.get("network", {}).get("recv_mb", 0.0),
+        "timestamp": time.time()
+    }
+
+
 @app.post("/api/kill/{pid}")
 async def kill_process(pid: int):
     return collector.terminate_process(pid)

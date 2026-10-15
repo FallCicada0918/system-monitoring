@@ -1,4 +1,4 @@
-﻿# Byte-compiled / optimized / DLL files
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
@@ -20,3 +20,18 @@ test_sec_dir*
 venv/
 .venv/
 env/
+
+# IDE & Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Backup & Merge leftovers
+*.orig
+*.bak

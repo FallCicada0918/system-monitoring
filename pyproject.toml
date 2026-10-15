@@ -27,7 +27,7 @@ cpulse = "cyber_pulse.cli:main"
 cyber-pulse = "cyber_pulse.cli:main"
 
 [tool.setuptools.packages.find]
-where = ["."]
+where = ["src"]
 include = ["cyber_pulse*"]
 
 [tool.setuptools.package-data]

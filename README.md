@@ -44,49 +44,84 @@ It transforms your machine into a Cyberpunk 2077 Netrunner cyberdeck terminal wi
 
 ## 3. Quick Start (启动指南)
 
-### Option A: Windows Double-Click (便捷启动)
-Double click run.bat in the root folder to open the interactive mode selector.
+### Option A: Windows Launcher (便捷启动)
+Double click `scripts/run.bat` or run:
+```bash
+python main.py
+```
 
 ### Option B: Command Line (命令行启动)
 
-1. Desktop Window Mode (Recommended):
-   python app.py --mode window
+1. Terminal Cyberpunk HUD (Default interactive dashboard):
+   ```bash
+   python main.py hud
+   ```
 
-2. Browser Fullscreen Mode (Press F11 in browser for immersion):
-   python app.py --mode browser
+2. Web Browser Fullscreen Mode:
+   ```bash
+   python main.py web
+   ```
 
-3. Headless LAN Server Mode (Access via phone/tablet on same Wi-Fi):
-   python app.py --mode server --port 8888
+3. Standalone Desktop Window Mode:
+   ```bash
+   python main.py web --window
+   ```
 
-4. Terminal ANSI Mode (Pure terminal cyberpunk ASCII monitor):
-   python app.py --mode cli
+4. Headless LAN Server Mode (Access via phone/tablet on same Wi-Fi):
+   ```bash
+   python main.py web --headless --port 8888
+   ```
+
+5. Live Top Processes Monitor:
+   ```bash
+   python main.py top
+   ```
+
+6. System Diagnostic Telemetry:
+   ```bash
+   python main.py report
+   ```
 
 ---
 
-## 4. File Structure (工程目录)
+## 4. Project Structure (工程目录规范)
 
-- app.py: FastAPI server, WebSocket hub, REST endpoints, and pywebview launcher.
-- collector.py: Hardware metrics engine (CPU, RAM, GPU, Disks, Network, Processes).
-- cli_hud.py: Terminal ANSI cyberpunk dashboard.
-- run.bat: Windows batch launcher.
-- requirements.txt: Python dependency list.
-- static/index.html: Holographic dashboard layout.
-- static/css/cyber.css: Cyberpunk styling, neon glow, themes, and CRT scanlines.
-- static/js/audio.js: Web Audio API sound generator.
-- static/js/matrix.js: Matrix digital rain and 3D grid animation.
-- static/js/app.js: Real-time telemetry, holographic gauges, and actions.
-
-
----
-
-## 5. API Endpoints (接口概览)
-
-- `GET /api/health` - System health heartbeat status and timestamp
-- `GET /api/stats` - Comprehensive hardware telemetry metrics
-- `GET /api/summary` - Aggregated resource consumption summary
-- `POST /api/purge_memory` - Trigger neural memory flush
-- `POST /api/kill/{pid}` - Terminate high-resource target process
-- `WS /ws/telemetry` - Real-time streaming WebSocket feed
+```
+system-monitoring/
+├── docs/                     # Project documentation & engineering logs
+│   └── TASK_PROGRESS.md      # Development and feature tracking
+├── scripts/                  # Automation, launcher & build scripts
+│   ├── build_binary.py       # Standalone PyInstaller compilation script
+│   ├── cpulse.bat            # Windows batch shortcut for CLI
+│   ├── cpulse.ps1            # PowerShell shortcut for CLI
+│   ├── cpulse.spec           # PyInstaller build specification
+│   ├── entrypoint.py         # PyInstaller bootstrap entrypoint
+│   ├── install.ps1           # Windows PATH installer script
+│   └── run.bat               # Interactive menu launcher
+├── src/                      # Source code (standard src-layout)
+│   └── cyber_pulse/          # Core package
+│       ├── __init__.py       # Package marker and version metadata
+│       ├── __main__.py       # Allows python -m cyber_pulse execution
+│       ├── app.py            # FastAPI server, WebSockets & REST endpoints
+│       ├── cli.py            # Unified command-line interface
+│       ├── cli_hud.py        # Terminal ANSI cyberpunk HUD dashboard
+│       ├── collector.py      # Hardware telemetry engine (CPU/RAM/GPU/Disk/Net)
+│       └── static/           # Cyberpunk Web HUD assets
+│           ├── index.html    # HUD canvas interface
+│           ├── css/          # Neon glow, themes, CRT scanlines
+│           └── js/           # Canvas graphics, Web Audio API, telemetry
+├── tests/                    # Automated unit tests
+│   ├── __init__.py
+│   ├── test_api.py           # REST endpoints test suite
+│   ├── test_cli.py           # CLI parser test suite
+│   └── test_collector.py     # System collector test suite
+├── .gitignore                # Git ignore patterns
+├── main.py                   # PyCharm / IDE development entry point
+├── pyproject.toml            # Modern Python build & package config
+├── requirements.txt          # Python dependency list
+├── setup.py                  # Setuptools configuration shim
+└── README.md                 # Project documentation
+```
 
 ---
 Encoding: UTF-8 (without BOM)

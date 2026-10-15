@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>机体生命征象诊断仪 // SOMATIC VITAL SIGNS HUD v2.0</title>
+  <link rel="stylesheet" href="/static/css/cyber.css">
+</head>
+<body>
+  <!-- Canvas Backgrounds -->
+  <canvas id="canvas-grid"></canvas>
+  <canvas id="canvas-matrix"></canvas>
+
+  <!-- CRT Scanlines & Visual Layers -->
+  <div class="scanlines-overlay"></div>
+  <div id="scanbeam" class="scanbeam"></div>
+
+  <!-- Main Cyber HUD Container -->
+  <div class="hud-container">
+
+    <!-- Top Telemetry Header -->
+    <header class="cyber-panel top-header">
+      <div class="brand-section">
+        <div class="logo-text" id="logo-text">机体生命征象<span>诊断仪</span></div>
+        <div class="node-badge">NODE-77 // HUD v2.0</div>
+        <div class="status-indicator">
+          <div id="status-dot" class="status-dot"></div>
+          <span id="status-text" style="font-size:11px; font-weight:700; letter-spacing:1px;">SYNCING...</span>
+        </div>
+        <div id="threat-badge" class="threat-badge">DEFCON 5: OPTIMAL</div>
+      </div>
+
+      <div class="header-actions">
+        <div style="font-size:11px; color:var(--text-secondary); margin-right:8px;">
+          HOST: <b id="sys-host" style="color:var(--neon-cyan)">--</b> | 
+          OS: <b id="sys-os" style="color:#fff">--</b> | 
+          UPTIME: <b id="sys-uptime" style="color:var(--neon-yellow)">00:00:00</b>
+        </div>
+        <button id="btn-audio-toggle" class="cyber-btn">SFX: ON</button>
+        <button id="btn-scanlines-toggle" class="cyber-btn">CRT: ON</button>
+        <button id="btn-matrix-toggle" class="cyber-btn">RAIN: ON</button>
+        
+        <select id="theme-select" class="cyber-select">
+          <option value="cyberpunk">NIGHT CITY 2077</option>
+          <option value="matrix">MATRIX CODE</option>
+          <option value="synthwave">SYNTHWAVE OUTRUN</option>
+          <option value="bloodhack">ARASAKA BLOOD OPS</option>
+        </select>
+        <select id="lang-select" class="cyber-select">
+          <option value="zh-CN">简体中文</option>
+          <option value="zh-TW">繁體中文</option>
+          <option value="en">English</option>
+          <option value="ja">日本語</option>
+        </select>
+
+        <button id="btn-fullscreen" class="cyber-btn btn-yellow">? FULLSCREEN</button>
+      </div>
+    </header>
+
+    <!-- Row 1: Four Main Cyber Core Holographic Gauges -->
+    <section class="gauges-grid">
+      <!-- CPU Holo-Core -->
+      <div class="cyber-panel gauge-card">
+        <div class="panel-header">
+          <div class="panel-title">? CPU HOLO-CORE</div>
+          <div class="panel-tag">PROCESSOR TELEMETRY</div>
+        </div>
+        <div class="gauge-center-box">
+          <canvas id="gauge-cpu" class="gauge-canvas" width="180" height="180"></canvas>
+          <div class="gauge-readout">
+            <div id="cpu-val" class="gauge-val-big">0.0%</div>
+            <div id="cpu-sub" class="gauge-sub-info">-- P / -- T</div>
+          </div>
+        </div>
+        <div class="cpu-cores-container">
+          <div class="cores-label-row">
+            <span>PER-CORE LOAD MATRIX</span>
+            <span>16 CORES ACTIVE</span>
+          </div>
+          <div id="cpu-cores-grid" class="cores-grid"></div>
+        </div>
+      </div>
+
+      <!-- RAM Neural Memory Matrix -->
+      <div class="cyber-panel gauge-card">
+        <div class="panel-header">
+          <div class="panel-title">NEURAL MEMORY</div>
+          <div class="panel-tag">RAM & SWAP ALLOCATION</div>
+        </div>
+        <div class="gauge-center-box">
+          <canvas id="gauge-ram" class="gauge-canvas" width="180" height="180"></canvas>
+          <div class="gauge-readout">
+            <div id="ram-val" class="gauge-val-big">0.0%</div>
+            <div id="ram-sub" class="gauge-sub-info">-- / -- GB</div>
+          </div>
+        </div>
+        <div class="metric-breakdown">
+          <div class="sub-bar-group">
+            <div class="sub-bar-label">
+              <span>PHYSICAL RAM</span>
+              <span>USED: <b id="ram-used-text" style="color:var(--neon-cyan)">--</b> | FREE: <b id="ram-free-text" style="color:#fff">--</b></span>
+            </div>
+            <div class="sub-bar-track">
+              <div id="ram-bar-fill" class="sub-bar-progress" style="width: 0%"></div>
+            </div>
+          </div>
+          <div class="sub-bar-group">
+            <div class="sub-bar-label">
+              <span>SWAP VIRTUAL BUFFER</span>
+              <span id="swap-val-text">-- / -- GB</span>
+            </div>
+            <div class="sub-bar-track">
+              <div id="swap-bar-fill" class="sub-bar-progress alt" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GPU Neural Acceleration (RTX 4060) -->
+      <div id="gpu-card" class="cyber-panel gauge-card">
+        <div class="panel-header">
+          <div class="panel-title">GPU NEURAL CORE</div>
+          <div id="gpu-name-tag" class="panel-tag">NVIDIA GRAPHICS</div>
+        </div>
+        <div class="gauge-center-box">
+          <canvas id="gauge-gpu" class="gauge-canvas" width="180" height="180"></canvas>
+          <div class="gauge-readout">
+            <div id="gpu-val" class="gauge-val-big">0%</div>
+            <div id="gpu-sub" class="gauge-sub-info">--?C | -- W</div>
+          </div>
+        </div>
+        <div class="metric-breakdown">
+          <div class="sub-bar-group">
+            <div class="sub-bar-label">
+              <span>VRAM CONSUMPTION</span>
+              <span id="gpu-vram-text">-- / -- MB</span>
+            </div>
+            <div class="sub-bar-track">
+              <div id="gpu-vram-bar" class="sub-bar-progress alt" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Storage Array / Hard Drives -->
+      <div class="cyber-panel gauge-card">
+        <div class="panel-header">
+          <div class="panel-title">STORAGE ARRAYS</div>
+          <div class="panel-tag">FILESYSTEM & DISK I/O</div>
+        </div>
+        <div class="gauge-center-box">
+          <canvas id="gauge-disk" class="gauge-canvas" width="180" height="180"></canvas>
+          <div class="gauge-readout">
+            <div class="gauge-val-big" style="font-size:24px; color:var(--neon-yellow);">ONLINE</div>
+            <div class="gauge-sub-info">STORAGE NOMINAL</div>
+          </div>
+        </div>
+        <div id="disks-container" class="disks-list"></div>
+      </div>
+    </section>
+
+    <!-- Row 2: Dual Real-time Cyber Oscilloscopes -->
+    <section class="waveforms-grid">
+      <!-- Network Cyber Radar -->
+      <div class="cyber-panel">
+        <div class="panel-header">
+          <div class="panel-title">NETWORK CYBER RADAR</div>
+          <div class="panel-tag">TX / RX DUAL OSCILLOSCOPE</div>
+        </div>
+        <div class="waveform-box">
+          <canvas id="net-waveform-canvas" class="waveform-canvas"></canvas>
+        </div>
+        <div class="telemetry-stats-row">
+          <div class="telemetry-pill">DOWNLINK: <b id="net-dl-speed" style="color:var(--neon-cyan)">0.0 KB/s</b></div>
+          <div class="telemetry-pill">UPLINK: <b id="net-ul-speed" style="color:var(--neon-magenta)">0.0 KB/s</b></div>
+          <div class="telemetry-pill">TOTAL RX: <b id="net-total-rx">0 MB</b></div>
+          <div class="telemetry-pill">TOTAL TX: <b id="net-total-tx">0 MB</b></div>
+          <div class="telemetry-pill">SOCKETS: <b id="net-conns">0</b></div>
+        </div>
+      </div>
+
+      <!-- CPU Timeline Oscilloscope -->
+      <div class="cyber-panel">
+        <div class="panel-header">
+          <div class="panel-title">CPU WORKLOAD TIMELINE</div>
+          <div class="panel-tag">60s SCROLLING WAVEFORM</div>
+        </div>
+        <div class="waveform-box">
+          <canvas id="cpu-waveform-canvas" class="waveform-canvas"></canvas>
+        </div>
+        <div class="telemetry-stats-row">
+          <div class="telemetry-pill">SAMPLING: <b>1.0 SEC INTERVAL</b></div>
+          <div class="telemetry-pill">ALGORITHM: <b>SMOOTH BEZIER SPECTRUM</b></div>
+          <div class="telemetry-pill">STATE: <b style="color:var(--neon-green)">HEALTHY</b></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Row 3: "" Cyber Action Deck -->
+    <section class="cyber-panel action-deck">
+      <div class="deck-headline">
+        <span>? PROTOCOL ACTIONS:</span>
+        <span style="font-size:10px; color:var(--text-secondary);">TACTICAL OVERRIDE & HARDWARE BOOST CONTROLS</span>
+      </div>
+      <div class="deck-buttons-group">
+        <button id="btn-overclock" class="cyber-btn btn-magenta">[ OVERCLOCK BOOST / ]</button>
+        <button id="btn-purge" class="cyber-btn">[ NEURAL FLUSH / ]</button>
+        <button id="btn-report" class="cyber-btn btn-yellow">[ COPY DIAGNOSTIC REPORT / ]</button>
+      </div>
+    </section>
+
+    <!-- Row 4: Target Surveillance Matrix (Process Manager) -->
+    <section class="cyber-panel">
+      <div class="panel-header">
+        <div class="panel-title">TARGET SURVEILLANCE MATRIX</div>
+        <div class="panel-tag">ACTIVE THREATS & TOP PROCESSES</div>
+      </div>
+
+      <div class="table-filter-bar">
+        <input id="process-search" type="text" class="cyber-input" placeholder="> SEARCH TARGET PID OR NAME...">
+        <div style="display:flex; gap:8px;">
+          <button id="sort-mem-btn" class="cyber-btn btn-magenta">SORT BY MEMORY</button>
+          <button id="sort-cpu-btn" class="cyber-btn">SORT BY CPU</button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="cyber-table">
+          <thead>
+            <tr>
+              <th>TARGET PID</th>
+              <th>PROCESS NAME</th>
+              <th>CPU LOAD</th>
+              <th>RAM %</th>
+              <th>RSS MEMORY</th>
+              <th>STATE</th>
+              <th>TACTICAL ACTION</th>
+            </tr>
+          </thead>
+          <tbody id="process-table-body">
+            <tr>
+              <td colspan="7" style="text-align:center; padding:20px; color:var(--text-dim);">
+                ACQUIRING TELEMETRY LOCK ON RUNNING PROCESSES...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Cyber Kill Confirmation Modal -->
+  <div id="kill-modal" class="cyber-modal-backdrop">
+    <div class="cyber-modal">
+      <div class="modal-header">SECURITY OVERRIDE REQUIRED</div>
+      <div class="modal-body">
+        CONFIRM FORCED TERMINATION OF TARGET PROCESS:<br><br>
+        <b id="modal-target-info" style="color:var(--neon-magenta); font-size:14px;">[PID: --]</b><br><br>
+        <span style="font-size:10px; color:var(--text-secondary);">
+          WARNING: PURGING UNSTABLE TARGET MAY CAUSE DATA LOSS OR SYSTEM CRASH. EXECUTE WITH CAUTION.
+        </span>
+      </div>
+      <div class="modal-actions">
+        <button class="cyber-btn" onclick="abortKill()">[ ABORT ]</button>
+        <button class="cyber-btn btn-magenta" onclick="executeKill()">[ EXECUTE PURGE ]</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cyber Toast Notification -->
+  <div id="cyber-toast" class="cyber-toast">[+] SYSTEM READY</div>
+
+  <!-- Scripts -->
+  <script src="/static/js/audio.js"></script>
+  <script src="/static/js/matrix.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

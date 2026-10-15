@@ -1,8 +1,11 @@
-﻿# -*- mode: python ; coding: utf-8 -*-
+# -*- mode: python ; coding: utf-8 -*-
 import os
 
-base_dir = os.path.abspath(".")
-static_source = os.path.join(base_dir, "cyber_pulse", "static")
+spec_dir = os.path.dirname(os.path.abspath(SPEC)) if 'SPEC' in dir() else os.path.abspath(".")
+repo_root = os.path.dirname(spec_dir) if os.path.basename(spec_dir) == "scripts" else spec_dir
+src_dir = os.path.join(repo_root, "src")
+static_source = os.path.join(src_dir, "cyber_pulse", "static")
+entrypoint_file = os.path.join(repo_root, "scripts", "entrypoint.py")
 
 excludes = [
     'IPython', 'ipykernel', 'jupyter', 'jupyter_client', 'jupyter_core', 'notebook',
@@ -13,8 +16,8 @@ excludes = [
 ]
 
 a = Analysis(
-    ['entrypoint.py'],
-    pathex=[base_dir],
+    [entrypoint_file],
+    pathex=[repo_root, src_dir],
     binaries=[],
     datas=[
         (static_source, os.path.join('cyber_pulse', 'static')),

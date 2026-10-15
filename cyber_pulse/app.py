@@ -66,6 +66,16 @@ async def serve_index():
         )
     return FileResponse(index_path)
 
+@app.get("/api/health")
+async def health_check():
+    return {
+        "status": "online",
+        "service": "cyber-pulse",
+        "version": "2.0.0",
+        "timestamp": time.time()
+    }
+
+
 
 @app.get("/api/stats")
 async def get_stats():
